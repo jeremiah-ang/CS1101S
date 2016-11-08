@@ -369,8 +369,27 @@ count_cycles(test_case6);
 *****************************************************
 *****************************************************
 */
+function is_visited(x, visited) {
+    return length(filter(function(a){ return x === a; }, visited)) > 0;
+}
+
+function add_visited(x, visited) {
+    return pair(x, visited);
+}
 
 function count_cycles(lst){
+    function helper(xs, visited) {
+        if(is_visited(xs, visited)) {
+            return 1;
+        } else if (!is_pair(xs)) {
+            return 0;
+        } else {
+            visited = add_visited(xs, visited);
+            return helper(head(xs), visited) + helper(tail(xs), visited);
+        }
+    }
+
+    return helper(lst, []);
 }
 
 var a = pair([], []); //([], [])
@@ -378,3 +397,12 @@ set_head(a, a); // (([], []), [])
 var test_case4 = pair(a, a); //((([], []), []), (([], []), []))
 count_cycles(test_case4);
 // returns 1;
+
+var test_case6 = pair(true, true);
+var help4 = pair(true, true);
+set_head(test_case6, help4);
+set_tail(test_case6, test_case6);
+set_head(help4, test_case6);
+set_tail(help4, help4);
+count_cycles(test_case6);
+// returns 3;

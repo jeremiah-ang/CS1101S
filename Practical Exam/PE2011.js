@@ -369,34 +369,36 @@ count_cycles(test_case6);
 *****************************************************
 *****************************************************
 */
-function is_visited(x, visited) {
-    return length(filter(function(a){ return x === a; }, visited)) > 0;
+
+function contains(xs, x) {
+    return length(filter(function(y){ return x === y; }, xs)) > 0;
+}
+function push(xs, x) {
+    var temp = pair(x, tail(xs));
+    set_tail(xs, temp);
 }
 
-function add_visited(x, visited) {
-    return pair(x, visited);
-}
-
-function count_cycles(lst){
-    function helper(xs, visited) {
-        if(is_visited(xs, visited)) {
-            return 1;
-        } else if (!is_pair(xs)) {
+function count_cycles(cycle) {
+    var visited = list("visited", []);
+    var path = list("path", []);
+    function travel(xs) {
+        if(is_empty_list(xs) || !is_pair(xs)) {
             return 0;
+        } else if (contains(path, head(xs))) {
+            if (contains(visited, path)) {
+                return 0;
+            } else {
+                push(visited, member(head(xs), path));
+                return 1;
+            }
         } else {
-            visited = add_visited(xs, visited);
-            return helper(head(xs), visited) + helper(tail(xs), visited);
+            push(path, head(xs));
+            return travel(head(xs)) + travel(tail(xs));
         }
     }
 
-    return helper(lst, []);
+    return travel(cycle);
 }
-
-var a = pair([], []); //([], [])
-set_head(a, a); // (([], []), [])
-var test_case4 = pair(a, a); //((([], []), []), (([], []), []))
-count_cycles(test_case4);
-// returns 1;
 
 var test_case6 = pair(true, true);
 var help4 = pair(true, true);
@@ -404,5 +406,5 @@ set_head(test_case6, help4);
 set_tail(test_case6, test_case6);
 set_head(help4, test_case6);
 set_tail(help4, help4);
-count_cycles(test_case6);
+display(count_cycles(test_case6));
 // returns 3;
